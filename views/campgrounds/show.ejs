@@ -1,0 +1,141 @@
+<% layout('layout/boilerplate') %>
+<style>
+  .mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+</style>
+<script crossorigin="anonymous">
+  const token='<%- process.env.MAPBOX_TOKEN %>'
+  const camp=<%- JSON.stringify(found) %>
+  //console.log(camp)
+</script>
+<div class="row mt-5">
+  <div class="col-6 mb-3">
+    
+    <div id="carouselExample" class="carousel slide">
+      <div class="carousel-inner">
+        <% for(let i=0;i<found.images.length;i++){ %>
+        <div class="carousel-item <%= i === 0 ?'active' : ''%>">
+          <img src="<%= found.images[i].url %>" crossorigin="anonymous" class="d-block w-100"  alt="Not Available" />
+        </div>
+        <% } %>
+      </div>
+      <% if(found.images.length>1){ %>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carouselExample"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carouselExample"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    <% } %>
+    </div>
+    <div class="card">
+     
+
+      <div class="card-body">
+        <h5 class="card-title"><%= found.title %></h5>
+        <p class="card-text"><%= found.description %></p>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-muted"><%= found.location %></li>
+        <li class="list-group-item">posted by <%= found.author.username %></li>
+        <li class="list-group-item">$<%= found.price %>/day</li>
+      </ul>
+      <% if(currentUser && currentUser.id === found.author.id &&
+      found.author.equals(currentUser.id)){ %>
+      <div class="card-body">
+        <a class="btn btn-info" href="/campgrounds/<%= found.id %>/edit"
+          >Edit</a
+        >
+        <form
+          class="d-inline"
+          action="/campgrounds/<%= found.id %>?_method=DELETE"
+          method="post"
+        >
+          <button class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+      <% } %>
+      <div class="card-footer">Newly added</div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div id="map"></div>
+    <h3>Leave a Review</h3>
+    <form
+      action="/campgrounds/<%= found.id %>/reviews"
+      method="POST"
+      class="mb-3 validate-form"
+      novalidate
+    >
+      <div>
+        <label class="form-label" for="rating">Rating</label>
+        <input
+          class="form-range"
+          type="range"
+          name="review[rating]"
+          id="rating"
+          min="1"
+          max="5"
+        />
+      </div>
+      <div>
+        <label class="form-label" for="body">Review</label>
+        <textarea
+          class="form-control"
+          name="review[body]"
+          id="body"
+          cols="30"
+          rows="3"
+          required
+        ></textarea>
+      </div>
+      <button class="btn btn-success mt-1">submit</button>
+    </form>
+
+    <% for(let review of found.reviews) {%>
+    <div class="card mb-1">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-10">
+            <h6 class="card-title">Review : <%= review.body %></h6>
+          </div>
+          <% if(review.author.equals(currentUser.id)){ %>
+          <div class="col-2">
+            <form
+              action="/campgrounds/<%= found.id %>/reviews/<%= review.id %>?_method=DELETE"
+              method="POST"
+            >
+              <button class="btn btn-sm btn-danger">delete</button>
+            </form>
+          </div>
+          <% } %>
+        </div>
+
+        <p class="card-text">
+          &#9733; <%= review.rating %> by <%= review.author.username %>
+        </p>
+      </div>
+    </div>
+
+    <% }%>
+  </div>
+</div>
+
+
+<script src="/js/showMap.js">
+	
+</script>

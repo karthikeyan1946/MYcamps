@@ -1,0 +1,40 @@
+<% layout('layout/boilerplate') %>
+<script crossorigin="anonymous">
+  const data = <%- JSON.stringify(campgrounds) %>
+  //console.log(data);
+  const alldata = { features: data };
+  const token = "<%- process.env.MAPBOX_TOKEN %>";
+</script>
+<div class="mt-5" id="cluster-map"></div>
+<% if(currentUser){ %>
+<h3 class="mt-1">welcome to all camps,<%= currentUser.username %></h3>
+<% }else{ %>
+<h3 class="mt-1">welcome to all camps</h3>
+<% } %>
+
+<!-- <a href="/campgrounds/new">Add new Campground</a> -->
+<% campgrounds.map((c)=>{ %>
+<div class="card mb-3">
+  <div class="row">
+    <div class="col-md-4">
+      <img
+        src="<%= c.images[0].url %>"
+        alt="not available"
+        class="rounded img-fluid"
+        crossorigin="anonymous"
+      />
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-tile"><%= c.title %></h5>
+        <p class="card-text"><%= c.description %></p>
+        <p class="card-text">
+          <small class="text-muted"><%= c.location%></small>
+        </p>
+        <a href="/campgrounds/<%= c.id %>/show" class="btn btn-primary">View</a>
+      </div>
+    </div>
+  </div>
+</div>
+<% }) %>
+<script src="/js/clustermap.js"></script>
